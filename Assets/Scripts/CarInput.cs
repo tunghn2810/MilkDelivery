@@ -17,16 +17,25 @@ public class CarInput : MonoBehaviour
         _carControls.Car.Enable();
 
         _carControls.Car.Accelerate.performed += Accelerate;
+        _carControls.Car.Accelerate.canceled += Accelerate;
         _carControls.Car.Steer.performed += Steer;
+        _carControls.Car.Steer.canceled += Steer;
+        _carControls.Car.Drift.performed += Drift;
+        _carControls.Car.Drift.canceled += Drift;
     }
 
     public void Accelerate(InputAction.CallbackContext context)
     {
-        Debug.Log("Accel");
+        _carController.Accelerate(context.ReadValue<Vector2>());
     }
 
     public void Steer(InputAction.CallbackContext context)
     {
-        Debug.Log("Steer" + context.ReadValue<Vector2>());
+        _carController.Steer(context.ReadValue<Vector2>());
+    }
+
+    public void Drift(InputAction.CallbackContext context)
+    {
+        _carController.Drift(context.performed);
     }
 }

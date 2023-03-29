@@ -4,54 +4,53 @@ using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
-    [SerializeField] private Transform[] _tires;
-    private Rigidbody _rgbd;
+    public WheelPhysics[] _wheels;
 
-    [SerializeField, Range(0f, 10f)] float _suspensionRestDist = 1f;
-    [SerializeField, Range(0f, 10f)] float _raycastDist = 0.6f;
-    [SerializeField, Range(0f, 100f)] float _springStrength = 10f;
-    [SerializeField, Range(0f, 100f)] float _springDamper = 8f;
+    [Header("Car Specs")]
+    [SerializeField, Range(0, 1)] private float _turnCurve;
 
-    private void Awake()
+    private float _steerAngle;
+    private float _steerInput;
+
+    private Vector2 _accelDirection;
+    private bool _isDrifting;
+
+
+    private void Update()
     {
-        _rgbd = GetComponent<Rigidbody>();
-    }
+        _steerAngle = Mathf.Rad2Deg * Mathf.Atan(_turnCurve) * _steerInput;
 
-    private void FixedUpdate()
-    {
-        for (int i = 0; i < _tires.Length; i++)
+        for (int i = 0; i < _wheels.Length; i++)
         {
-            Force(_tires[i]);
+            if (_wheels[i].FrontLeftWheel || _wheels[i].FrontRightWheel)
+            {
+                _wheels[i].SteerAngle = _steerAngle;
+            }
+        }
+
+        for (int i = 0; i < _wheels.Length; i++)
+        {
+            _wheels[i].AccelDirection = _accelDirection.y;
+        }
+
+        for (int i = 0; i < _wheels.Length; i++)
+        {
+            _wheels[i].DriftingMultiplier = _isDrifting == true ? 0.4f : 1;
         }
     }
 
-    private void Force(Transform tireTransform)
+    public void Steer(Vector2 steerDir)
     {
-        RaycastHit raycastHit;
-        bool hit = Physics.Raycast(tireTransform.position, Vector3.down, out raycastHit, _raycastDist);
+        _steerInput = steerDir.x;
+    }
 
-        //Spring force
-        if (hit)
-        {
-            //World space direction of spring force
-            Vector3 springDir = tireTransform.up;
+    public void Accelerate(Vector2 accelDirection)
+    {
+        _accelDirection = accelDirection;
+    }
 
-            //World space velocity of this tire
-            Vector3 tireWorldVel = _rgbd.GetPointVelocity(tireTransform.position);
-
-            //Calculate offset from the raycast
-            float offset = _suspensionRestDist - raycastHit.distance;
-
-            //Calculate velocity along the spring direction
-            float vel = Vector3.Dot(springDir, tireWorldVel);
-
-            //Calculate the magnitude of dampened spring force
-            float force = (offset * _springStrength) - (vel * _springDamper);
-
-            Debug.DrawRay(tireTransform.position, springDir * force, Color.green);
-
-            //Apply the force at the location of the tire, in the direction of the suspension
-            _rgbd.AddForceAtPosition(springDir * force, tireTransform.position);
-        }
+    public void Drift(bool isDrifting)
+    {
+        _isDrifting = isDrifting;
     }
 }
