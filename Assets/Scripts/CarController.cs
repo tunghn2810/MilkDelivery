@@ -4,53 +4,81 @@ using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
-    public WheelPhysics[] _wheels;
+    [SerializeField] private WheelCollider[] _wheelColliders; //Front Left - Front Right - Rear Left - Rear Right
+    [SerializeField] private Transform[] _wheelTransforms; //Front Left - Front Right - Rear Left - Rear Right
 
-    [Header("Car Specs")]
-    [SerializeField, Range(0, 1)] private float _turnCurve;
+    private float _accelDirection;
+    private float _steerDirection;
+    private bool _isBraking;
 
     private float _steerAngle;
-    private float _steerInput;
-
-    private Vector2 _accelDirection;
-    private bool _isDrifting;
+    private float _currentBrakeForce;
 
 
-    private void Update()
+    [SerializeField] private float _motorForce;
+    [SerializeField] private float _brakeForce;
+    [SerializeField] private float _maxSteerAngle;
+
+    private void FixedUpdate()
     {
-        _steerAngle = Mathf.Rad2Deg * Mathf.Atan(_turnCurve) * _steerInput;
+        ApplyAcceleration();
+        ApplySteering();
+        ApplyBrake();
+        UpdateWheels();
+    }
 
-        for (int i = 0; i < _wheels.Length; i++)
-        {
-            if (_wheels[i].FrontLeftWheel || _wheels[i].FrontRightWheel)
-            {
-                _wheels[i].SteerAngle = _steerAngle;
-            }
-        }
+    private void ApplyAcceleration()
+    {
+        _wheelColliders[0].motorTorque = _accelDirection * _motorForce;
+        _wheelColliders[1].motorTorque = _accelDirection * _motorForce;
+    }
 
-        for (int i = 0; i < _wheels.Length; i++)
-        {
-            _wheels[i].AccelDirection = _accelDirection.y;
-        }
+    private void ApplySteering()
+    {
+        _steerAngle = _maxSteerAngle * _steerDirection;
+        
+        _wheelColliders[0].steerAngle = _steerAngle;
+        _wheelColliders[1].steerAngle = _steerAngle;
+    }
 
-        for (int i = 0; i < _wheels.Length; i++)
+    private void ApplyBrake()
+    {
+        _currentBrakeForce = _isBraking ? _brakeForce : 0f;
+        for (int i = 0; i < _wheelColliders.Length; i++)
         {
-            _wheels[i].DriftingMultiplier = _isDrifting == true ? 0.4f : 1;
+            _wheelColliders[i].brakeTorque = _currentBrakeForce;
         }
     }
 
-    public void Steer(Vector2 steerDir)
+    public void HandleAcceleration(Vector2 accelDirection)
     {
-        _steerInput = steerDir.x;
+        _accelDirection = accelDirection.y;
     }
 
-    public void Accelerate(Vector2 accelDirection)
+    public void HandleSteering(Vector2 steerDirection)
     {
-        _accelDirection = accelDirection;
+        _steerDirection = steerDirection.x;
     }
 
-    public void Drift(bool isDrifting)
+    public void HandleBrake(bool isBraking)
     {
-        _isDrifting = isDrifting;
+        _isBraking = isBraking;
+    }
+
+    private void UpdateWheels()
+    {
+        for (int i = 0; i < _wheelColliders.Length; i++)
+        {
+            UpdateSingleWheel(_wheelColliders[i], _wheelTransforms[i]);
+        }
+    }
+
+    private void UpdateSingleWheel(WheelCollider wheelCollider, Transform wheelTransform)
+    {
+        Vector3 pos;
+        Quaternion rot;
+        wheelCollider.GetWorldPose(out pos, out rot);
+        wheelTransform.position = pos;
+        wheelTransform.rotation = rot;
     }
 }

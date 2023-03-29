@@ -46,7 +46,7 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Drift"",
+                    ""name"": ""Brake"",
                     ""type"": ""Button"",
                     ""id"": ""cbee8507-fb41-41a1-bb64-64139ae29758"",
                     ""expectedControlType"": ""Button"",
@@ -129,7 +129,7 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Drift"",
+                    ""action"": ""Brake"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -142,7 +142,7 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
         m_Car = asset.FindActionMap("Car", throwIfNotFound: true);
         m_Car_Accelerate = m_Car.FindAction("Accelerate", throwIfNotFound: true);
         m_Car_Steer = m_Car.FindAction("Steer", throwIfNotFound: true);
-        m_Car_Drift = m_Car.FindAction("Drift", throwIfNotFound: true);
+        m_Car_Brake = m_Car.FindAction("Brake", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -206,14 +206,14 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
     private List<ICarActions> m_CarActionsCallbackInterfaces = new List<ICarActions>();
     private readonly InputAction m_Car_Accelerate;
     private readonly InputAction m_Car_Steer;
-    private readonly InputAction m_Car_Drift;
+    private readonly InputAction m_Car_Brake;
     public struct CarActions
     {
         private @CarControls m_Wrapper;
         public CarActions(@CarControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Accelerate => m_Wrapper.m_Car_Accelerate;
         public InputAction @Steer => m_Wrapper.m_Car_Steer;
-        public InputAction @Drift => m_Wrapper.m_Car_Drift;
+        public InputAction @Brake => m_Wrapper.m_Car_Brake;
         public InputActionMap Get() { return m_Wrapper.m_Car; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -229,9 +229,9 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
             @Steer.started += instance.OnSteer;
             @Steer.performed += instance.OnSteer;
             @Steer.canceled += instance.OnSteer;
-            @Drift.started += instance.OnDrift;
-            @Drift.performed += instance.OnDrift;
-            @Drift.canceled += instance.OnDrift;
+            @Brake.started += instance.OnBrake;
+            @Brake.performed += instance.OnBrake;
+            @Brake.canceled += instance.OnBrake;
         }
 
         private void UnregisterCallbacks(ICarActions instance)
@@ -242,9 +242,9 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
             @Steer.started -= instance.OnSteer;
             @Steer.performed -= instance.OnSteer;
             @Steer.canceled -= instance.OnSteer;
-            @Drift.started -= instance.OnDrift;
-            @Drift.performed -= instance.OnDrift;
-            @Drift.canceled -= instance.OnDrift;
+            @Brake.started -= instance.OnBrake;
+            @Brake.performed -= instance.OnBrake;
+            @Brake.canceled -= instance.OnBrake;
         }
 
         public void RemoveCallbacks(ICarActions instance)
@@ -266,6 +266,6 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
     {
         void OnAccelerate(InputAction.CallbackContext context);
         void OnSteer(InputAction.CallbackContext context);
-        void OnDrift(InputAction.CallbackContext context);
+        void OnBrake(InputAction.CallbackContext context);
     }
 }

@@ -6,12 +6,14 @@ using UnityEngine.InputSystem;
 public class CarInput : MonoBehaviour
 {
     private CarController _carController;
+    private CarController1 _carController1;
 
     private CarControls _carControls; 
 
     private void Awake()
     {
         _carController = GetComponent<CarController>();
+        _carController1 = GetComponent<CarController1>();
 
         _carControls = new CarControls();
         _carControls.Car.Enable();
@@ -20,22 +22,25 @@ public class CarInput : MonoBehaviour
         _carControls.Car.Accelerate.canceled += Accelerate;
         _carControls.Car.Steer.performed += Steer;
         _carControls.Car.Steer.canceled += Steer;
-        _carControls.Car.Drift.performed += Drift;
-        _carControls.Car.Drift.canceled += Drift;
+        _carControls.Car.Brake.performed += Brake;
+        _carControls.Car.Brake.canceled += Brake;
     }
 
     public void Accelerate(InputAction.CallbackContext context)
     {
-        _carController.Accelerate(context.ReadValue<Vector2>());
+        _carController1?.Accelerate(context.ReadValue<Vector2>());
+        _carController?.HandleAcceleration(context.ReadValue<Vector2>());
     }
 
     public void Steer(InputAction.CallbackContext context)
     {
-        _carController.Steer(context.ReadValue<Vector2>());
+        _carController1?.Steer(context.ReadValue<Vector2>());
+        _carController?.HandleSteering(context.ReadValue<Vector2>());
     }
 
-    public void Drift(InputAction.CallbackContext context)
+    public void Brake(InputAction.CallbackContext context)
     {
-        _carController.Drift(context.performed);
+        _carController1?.Brake(context.performed);
+        _carController?.HandleBrake(context.performed);
     }
 }
