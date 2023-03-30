@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CarController1 : MonoBehaviour
 {
-    public WheelPhysics[] _wheels;
+    public WheelPhysics1[] _wheels;
 
     [Header("Car Specs")]
     [SerializeField, Range(0, 1)] private float _turnCurve;

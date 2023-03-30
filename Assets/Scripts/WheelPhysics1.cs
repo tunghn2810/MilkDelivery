@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WheelPhysics : MonoBehaviour
+public class WheelPhysics1 : MonoBehaviour
 {
 	private Rigidbody _rgbd;
 	[SerializeField] private Transform _wheelTransform;

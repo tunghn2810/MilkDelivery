@@ -7,6 +7,7 @@ public class CarInput : MonoBehaviour
 {
     private CarController _carController;
     private CarController1 _carController1;
+    private CarController2 _carController2;
 
     private CarControls _carControls; 
 
@@ -14,6 +15,7 @@ public class CarInput : MonoBehaviour
     {
         _carController = GetComponent<CarController>();
         _carController1 = GetComponent<CarController1>();
+        _carController2 = GetComponent<CarController2>();
 
         _carControls = new CarControls();
         _carControls.Car.Enable();
@@ -28,19 +30,22 @@ public class CarInput : MonoBehaviour
 
     public void Accelerate(InputAction.CallbackContext context)
     {
-        _carController1?.Accelerate(context.ReadValue<Vector2>());
         _carController?.HandleAcceleration(context.ReadValue<Vector2>());
+        _carController1?.Accelerate(context.ReadValue<Vector2>());
+        _carController2?.Accelerate(context.ReadValue<Vector2>());
     }
 
     public void Steer(InputAction.CallbackContext context)
     {
-        _carController1?.Steer(context.ReadValue<Vector2>());
         _carController?.HandleSteering(context.ReadValue<Vector2>());
+        _carController1?.Steer(context.ReadValue<Vector2>());
+        _carController2?.Steer(context.ReadValue<Vector2>());
     }
 
     public void Brake(InputAction.CallbackContext context)
     {
-        _carController1?.Brake(context.performed);
         _carController?.HandleBrake(context.performed);
+        _carController1?.Brake(context.performed);
+        _carController2?.Brake(context.performed);
     }
 }
