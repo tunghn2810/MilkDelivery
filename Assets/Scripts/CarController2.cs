@@ -33,6 +33,7 @@ public class CarController2 : MonoBehaviour
         for (int i = 0; i < _wheels.Length; i++)
         {
             _wheels[i].IsBraking = _isBraking;
+            _wheels[i].BrakeMultiplier = _isBraking == true ? 0.2f : 1;
         }
     }
 

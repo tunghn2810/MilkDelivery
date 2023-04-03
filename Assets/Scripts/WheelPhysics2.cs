@@ -48,12 +48,17 @@ public class WheelPhysics2 : MonoBehaviour
     [SerializeField] private AnimationCurve _accelCurve;
     [SerializeField] private float _maxSpeed;
     [SerializeField] private float _brakeStrength;
-    private float _currentSpeed;
+    [SerializeField] private float _rollingBrakeStrength;
+    [SerializeField] private float _currentSpeed;
     private float _normalizedSpeed;
     private float _availableTorque;
     private Vector3 _accelForce;
     private float _reverseSpeed;
     private Vector3 _brakeForce;
+    private Vector3 _rollingForce;
+
+    //Wheel spin
+    private float _spinAngle;
 
     //Inputs
 	private float _steerAngle;
@@ -62,6 +67,9 @@ public class WheelPhysics2 : MonoBehaviour
     public float AccelDirection { get => _accelDirection; set => _accelDirection = value; }
     private bool _isBraking;
     public bool IsBraking { get => _isBraking; set => _isBraking = value; }
+    private float _brakeMultiplier;
+    public float BrakeMultiplier { get => _brakeMultiplier; set => _brakeMultiplier = value; }
+
 
     private void Start()
     {
@@ -71,11 +79,17 @@ public class WheelPhysics2 : MonoBehaviour
     private void Update()
     {
         RotateWheel();
+        SpinWheel();
     }
 
     private void FixedUpdate()
     {
-		Force();
+        if (_rgbd.velocity.magnitude < 0.01f)
+        {
+            _rgbd.velocity = Vector3.zero;
+        }
+        _rgbd.velocity = Vector3.ClampMagnitude(_rgbd.velocity, _maxSpeed);
+        Force();
     }
 
 	private void Force()
@@ -94,7 +108,7 @@ public class WheelPhysics2 : MonoBehaviour
 
             //Steering force
             _steeringVelocity = Vector3.Dot(transform.right, _worldVelocity);
-            _steeringAccel = (-_steeringVelocity * _tireGripFactor) / Time.fixedDeltaTime;
+            _steeringAccel = (-_steeringVelocity * _tireGripFactor * _brakeMultiplier) / Time.fixedDeltaTime;
             _steeringForce = transform.right * _tireMass * _steeringAccel;
             _rgbd.AddForceAtPosition(_steeringForce, hit.point);
 
@@ -106,11 +120,17 @@ public class WheelPhysics2 : MonoBehaviour
             _rgbd.AddForceAtPosition(_accelForce, hit.point);
 
             //Brake force
-            if (_isBraking && _currentSpeed > 0)
+            if (_isBraking && Mathf.Abs(_currentSpeed) > 0)
             {
                 //_reverseSpeed = Vector3.Dot(-_rgbd.transform.forward, _rgbd.velocity);
-                _brakeForce = -_rgbd.velocity * _brakeStrength;
+                _brakeForce = -_rgbd.velocity.normalized * _brakeStrength;
                 _rgbd.AddForceAtPosition(_brakeForce, hit.point);
+            }
+
+            if (_accelDirection == 0)
+            {
+                _rollingForce = -_rgbd.velocity.normalized * _rollingBrakeStrength;
+                _rgbd.AddForceAtPosition(_rollingForce, hit.point);
             }
         }
 	}
@@ -121,4 +141,11 @@ public class WheelPhysics2 : MonoBehaviour
         _wheelTransform.localRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y + _wheelAngle, transform.localRotation.z);
 		transform.localRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y + _wheelAngle, transform.localRotation.z);
 	}
+
+    private void SpinWheel()
+    {
+        _spinAngle += _rgbd.velocity.magnitude;
+        //_wheelTransform.Rotate(_spinAngle * Mathf.Sign(_currentSpeed), 0, 0);
+        _wheelTransform.localRotation = Quaternion.Euler(_wheelTransform.localRotation.x + _spinAngle, _wheelTransform.localRotation.y, _wheelTransform.localRotation.z);
+    }
 }
