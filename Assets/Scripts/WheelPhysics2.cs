@@ -8,7 +8,7 @@ public class WheelPhysics2 : MonoBehaviour
     private Rigidbody _rgbd;
 	[SerializeField] private Transform _wheelTransform;
     
-    //Wheel classification
+    //Wheels
 	[SerializeField] private bool _frontLeftWheel;
     [SerializeField] private bool _frontRightWheel;
     [SerializeField] private bool _rearLeftWheel;
@@ -127,6 +127,7 @@ public class WheelPhysics2 : MonoBehaviour
                 _rgbd.AddForceAtPosition(_brakeForce, hit.point);
             }
 
+            //Rolling drag force
             if (_accelDirection == 0)
             {
                 _rollingForce = -_rgbd.velocity.normalized * _rollingBrakeStrength;
