@@ -18,7 +18,7 @@ public class WheelPhysics1 : MonoBehaviour
     public bool FrontRightWheel { get => _frontRightWheel; }
     public bool RearLeftWheel { get => _rearLeftWheel; }
     public bool RearRightWheel { get => _rearRightWheel; }
-	[SerializeField] float _wheelRadius;
+	[SerializeField] private float _wheelRadius;
 	private Vector3 _totalForce;
 
 
@@ -55,6 +55,7 @@ public class WheelPhysics1 : MonoBehaviour
 	private float _forceRight;
 	private Vector3 _brakeForce;
 	private Vector3 _rollingForce;
+	private Vector3 _counterAngularForce;
 
 
 	//Inputs
@@ -64,8 +65,6 @@ public class WheelPhysics1 : MonoBehaviour
 	public float AccelDirection { get => _accelDirection; set => _accelDirection = value; }
     private bool _isBraking;
     public bool IsBraking { get => _isBraking; set => _isBraking = value; }
-	private float _brakeMultiplier;
-	public float BrakeMultiplier { get => _brakeMultiplier; set => _brakeMultiplier = value; }
 
 
     private void Start()
@@ -107,25 +106,25 @@ public class WheelPhysics1 : MonoBehaviour
 			
 			_suspensionForce = (_springForce + _dampingForce) * transform.up;
 
-			//_rgbd.AddForceAtPosition(_suspensionForce, hit.point);
+            //_rgbd.AddForceAtPosition(_suspensionForce, hit.point);
 
-			//Acceleration force
+            //Acceleration force
             _localVelocity = transform.InverseTransformDirection(_rgbd.GetPointVelocity(hit.point));
             _forceForward = _accelDirection * _accelRate * _springForce;
             _forceLeft = _localVelocity.x * _springForce;
-
+			
 			_accelForce = _forceForward * transform.forward + _forceLeft * -transform.right;
-
+			
             //_rgbd.AddForceAtPosition(_accelForce, hit.point);
 			
-			//Speed
+			////Speed
 			_currentSpeed = Vector3.Dot(_rgbd.transform.forward, _rgbd.velocity);
-
-			//Brake force
+			
+			////Brake force
             if (_isBraking && Mathf.Abs(_currentSpeed) > 0)
             {
 				_forceBackward = _brakeStrength * _springForce;
-
+			
 				_brakeForce = _forceBackward * -_rgbd.velocity.normalized;
                 //_brakeForce = -_rgbd.velocity.normalized * _brakeStrength;
                 //_rgbd.AddForceAtPosition(_brakeForce, hit.point);
@@ -134,20 +133,24 @@ public class WheelPhysics1 : MonoBehaviour
 			{
 				_brakeForce = Vector3.zero;
 			}
-
+			
 			//Rolling drag force
             if (_accelDirection == 0)
             {
                 _rollingForce = -_rgbd.velocity.normalized * _brakeStrength/10f;
+                _counterAngularForce = -_rgbd.angularVelocity.normalized * _brakeStrength/10f;
                 //_rgbd.AddForceAtPosition(_rollingForce, hit.point);
             }
 			else
 			{
 				_rollingForce = Vector3.zero;
-			}
+				_counterAngularForce = Vector3.zero;
+
+            }
 
 			_totalForce = _suspensionForce + _accelForce + _brakeForce + _rollingForce;
-			_rgbd.AddForceAtPosition(_totalForce, hit.point);
+			_rgbd.AddForceAtPosition(_totalForce, transform.position);
+			_rgbd.AddTorque(_counterAngularForce);
         }
 	}
 
