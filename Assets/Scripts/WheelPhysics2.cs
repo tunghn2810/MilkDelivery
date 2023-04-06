@@ -104,7 +104,7 @@ public class WheelPhysics2 : MonoBehaviour
             _springVelocity = Vector3.Dot(transform.up, _worldVelocity);
             _springForce = (_springOffset * _springStrength) - (_springVelocity * _springDamping);
 			_suspensionForce = _springForce * transform.up;
-			_rgbd.AddForceAtPosition(_suspensionForce, hit.point);
+			_rgbd.AddForceAtPosition(_suspensionForce, transform.position);
 
             //Steering force
             _steeringVelocity = Vector3.Dot(transform.right, _worldVelocity);
@@ -117,21 +117,21 @@ public class WheelPhysics2 : MonoBehaviour
             _normalizedSpeed = Mathf.Clamp01(Mathf.Abs(_currentSpeed) / _maxSpeed);
             _availableTorque = _accelCurve.Evaluate(_normalizedSpeed) * _accelDirection;
             _accelForce = transform.forward * _availableTorque;
-            _rgbd.AddForceAtPosition(_accelForce, hit.point);
+            _rgbd.AddForceAtPosition(_accelForce, transform.position);
 
             //Brake force
             if (_isBraking && Mathf.Abs(_currentSpeed) > 0)
             {
                 //_reverseSpeed = Vector3.Dot(-_rgbd.transform.forward, _rgbd.velocity);
                 _brakeForce = -_rgbd.velocity.normalized * _brakeStrength;
-                _rgbd.AddForceAtPosition(_brakeForce, hit.point);
+                _rgbd.AddForceAtPosition(_brakeForce, transform.position);
             }
 
             //Rolling drag force
             if (_accelDirection == 0)
             {
                 _rollingForce = -_rgbd.velocity.normalized * _rollingBrakeStrength;
-                _rgbd.AddForceAtPosition(_rollingForce, hit.point);
+                _rgbd.AddForceAtPosition(_rollingForce, transform.position);
             }
         }
 	}

@@ -44,9 +44,12 @@ public class CarController : MonoBehaviour
     private void ApplyBrake()
     {
         _currentBrakeForce = _isBraking ? _brakeForce : 0f;
-        for (int i = 0; i < _wheelColliders.Length; i++)
+        if (_isBraking)
         {
-            _wheelColliders[i].brakeTorque = _currentBrakeForce;
+            for (int i = 0; i < _wheelColliders.Length; i++)
+            {
+                _wheelColliders[i].brakeTorque = _currentBrakeForce;
+            }
         }
     }
 

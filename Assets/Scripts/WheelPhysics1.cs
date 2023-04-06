@@ -109,7 +109,7 @@ public class WheelPhysics1 : MonoBehaviour
             //_rgbd.AddForceAtPosition(_suspensionForce, hit.point);
 
             //Acceleration force
-            _localVelocity = transform.InverseTransformDirection(_rgbd.GetPointVelocity(hit.point));
+            _localVelocity = transform.InverseTransformDirection(_rgbd.GetPointVelocity(transform.position));
             _forceForward = _accelDirection * _accelRate * _springForce;
             _forceLeft = _localVelocity.x * _springForce;
 			
