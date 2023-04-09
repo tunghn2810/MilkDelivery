@@ -4,13 +4,24 @@ using UnityEngine;
 
 public class CarController2 : MonoBehaviour
 {
-   public WheelPhysics2[] _wheels;
+    [SerializeField] private float _centerOfMassOffset;
+    public WheelPhysics2[] _wheels;
 
     private float _steerAngle;
     private float _steerInput;
     private Vector2 _accelDirection;
     private bool _isBraking;
     [SerializeField, Range(0, 1)] private float _turnCurve;
+
+    private Vector3 _centerOfMass;
+    [SerializeField] private GameObject _milkBox;
+
+    private void Awake()
+    {
+        _centerOfMass = GetComponent<Rigidbody>().centerOfMass - new Vector3(0, _centerOfMassOffset, 0);
+        _milkBox.SetActive(true);
+        GetComponent<Rigidbody>().centerOfMass = _centerOfMass;
+    }
 
 
     private void Update()
@@ -33,7 +44,6 @@ public class CarController2 : MonoBehaviour
         for (int i = 0; i < _wheels.Length; i++)
         {
             _wheels[i].IsBraking = _isBraking;
-            _wheels[i].BrakeMultiplier = _isBraking == true ? 0.2f : 1;
         }
     }
 

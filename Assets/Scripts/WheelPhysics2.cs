@@ -57,18 +57,21 @@ public class WheelPhysics2 : MonoBehaviour
     private Vector3 _brakeForce;
     private Vector3 _rollingForce;
 
+    [Header("Drifting")]
+    [SerializeField] private float _defaultDriftMultiplier;
+    [SerializeField] private float _driftingMultiplier;
+
     //Wheel spin
     private float _spinAngle;
 
     //Inputs
-	private float _steerAngle;
+	[SerializeField] private float _steerAngle;
     public float SteerAngle { get => _steerAngle; set => _steerAngle = value; }
     private float _accelDirection;
     public float AccelDirection { get => _accelDirection; set => _accelDirection = value; }
     private bool _isBraking;
     public bool IsBraking { get => _isBraking; set => _isBraking = value; }
-    private float _brakeMultiplier;
-    public float BrakeMultiplier { get => _brakeMultiplier; set => _brakeMultiplier = value; }
+    [SerializeField] private float _driftMultiplier;
 
 
     private void Start()
@@ -78,6 +81,7 @@ public class WheelPhysics2 : MonoBehaviour
 
     private void Update()
     {
+        DriftFactor();
         RotateWheel();
         SpinWheel();
     }
@@ -108,9 +112,9 @@ public class WheelPhysics2 : MonoBehaviour
 
             //Steering force
             _steeringVelocity = Vector3.Dot(transform.right, _worldVelocity);
-            _steeringAccel = (-_steeringVelocity * _tireGripFactor * _brakeMultiplier) / Time.fixedDeltaTime;
+            _steeringAccel = (-_steeringVelocity * _tireGripFactor * _driftMultiplier) / Time.fixedDeltaTime;
             _steeringForce = transform.right * _tireMass * _steeringAccel;
-            _rgbd.AddForceAtPosition(_steeringForce, hit.point);
+            _rgbd.AddForceAtPosition(_steeringForce, transform.position);
 
             //Acceleration force
             _currentSpeed = Vector3.Dot(_rgbd.transform.forward, _rgbd.velocity);
@@ -148,5 +152,17 @@ public class WheelPhysics2 : MonoBehaviour
         _spinAngle += _rgbd.velocity.magnitude;
         //_wheelTransform.Rotate(_spinAngle * Mathf.Sign(_currentSpeed), 0, 0);
         _wheelTransform.localRotation = Quaternion.Euler(_wheelTransform.localRotation.x + _spinAngle, _wheelTransform.localRotation.y, _wheelTransform.localRotation.z);
+    }
+
+    private void DriftFactor()
+    {
+        if (_isBraking)
+        {
+            _driftMultiplier = Mathf.Lerp(_driftMultiplier, _driftingMultiplier, 5f * Time.deltaTime);
+        }
+        else
+        {
+            _driftMultiplier = Mathf.Lerp(_driftMultiplier, _defaultDriftMultiplier, 0.5f * Time.deltaTime);
+        }
     }
 }
