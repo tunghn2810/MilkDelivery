@@ -26,6 +26,7 @@ public class CameraControl : MonoBehaviour
     //Obstacle
     private GameObject _obstacle;
     private Vector3 _obsPosition;
+    private GameObject _closestObstacle;
 
     private void Awake()
     {
@@ -81,6 +82,8 @@ public class CameraControl : MonoBehaviour
         if (collider.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
         {
             _isBlockedBehind = true;
+            _obstacle = collider.gameObject;
+            _obsPosition = _obstacle.transform.position;
         }
     }
 

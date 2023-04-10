@@ -47,6 +47,7 @@ public class WheelPhysics2 : MonoBehaviour
     [Header("Acceleration")]
     [SerializeField] private AnimationCurve _accelCurve;
     [SerializeField] private float _maxSpeed;
+    [SerializeField] private float _accelStrength;
     [SerializeField] private float _brakeStrength;
     [SerializeField] private float _rollingBrakeStrength;
     [SerializeField] private float _currentSpeed;
@@ -120,21 +121,21 @@ public class WheelPhysics2 : MonoBehaviour
             _currentSpeed = Vector3.Dot(_rgbd.transform.forward, _rgbd.velocity);
             _normalizedSpeed = Mathf.Clamp01(Mathf.Abs(_currentSpeed) / _maxSpeed);
             _availableTorque = _accelCurve.Evaluate(_normalizedSpeed) * _accelDirection;
-            _accelForce = transform.forward * _availableTorque;
+            _accelForce = transform.forward * _availableTorque * _accelStrength;
             _rgbd.AddForceAtPosition(_accelForce, transform.position);
 
             //Brake force
             if (_isBraking && Mathf.Abs(_currentSpeed) > 0)
             {
                 //_reverseSpeed = Vector3.Dot(-_rgbd.transform.forward, _rgbd.velocity);
-                _brakeForce = -_rgbd.velocity.normalized * _brakeStrength;
+                _brakeForce = -_rgbd.velocity.normalized * _brakeStrength * _accelStrength;
                 _rgbd.AddForceAtPosition(_brakeForce, transform.position);
             }
 
             //Rolling drag force
             if (_accelDirection == 0)
             {
-                _rollingForce = -_rgbd.velocity.normalized * _rollingBrakeStrength;
+                _rollingForce = -_rgbd.velocity.normalized * _rollingBrakeStrength * _accelStrength;
                 _rgbd.AddForceAtPosition(_rollingForce, transform.position);
             }
         }
