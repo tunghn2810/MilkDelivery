@@ -17,6 +17,8 @@ public class CameraControl : MonoBehaviour
     //private float _obsCamDist = 2f;
 
     //Transposer
+    [SerializeField] private float _defaultOffsetZ;
+    [SerializeField] private float _obsOffsetZ;
     [SerializeField] private float _defaultOffsetY;
     [SerializeField] private float _obsOffsetY;
     [SerializeField] private float _adjustTime;
@@ -43,11 +45,15 @@ public class CameraControl : MonoBehaviour
     {
         if (_isBlockedBehind)
         {
-            _obsOffsetY = _obstacle.GetComponent<MeshRenderer>().bounds.extents.y * 4f;
+            _cineTrans.m_FollowOffset.z = Mathf.Lerp(_cineTrans.m_FollowOffset.z, _obsOffsetZ, _adjustTime * Time.deltaTime);
+
+            _obsOffsetY = _obstacle.GetComponent<MeshRenderer>().bounds.extents.y * 2f;
             _cineTrans.m_FollowOffset.y = Mathf.Lerp(_cineTrans.m_FollowOffset.y, _obsOffsetY, _adjustTime * Time.deltaTime);
         }
         else if (!_isBlockedBehind)
         {
+            _cineTrans.m_FollowOffset.z = Mathf.Lerp(_cineTrans.m_FollowOffset.z, _defaultOffsetZ, _adjustTime * Time.deltaTime);
+
             _cineTrans.m_FollowOffset.y = Mathf.Lerp(_cineTrans.m_FollowOffset.y, _defaultOffsetY, _adjustTime * Time.deltaTime);
         }
     }

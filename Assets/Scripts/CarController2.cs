@@ -19,7 +19,7 @@ public class CarController2 : MonoBehaviour
     private void Awake()
     {
         _centerOfMass = GetComponent<Rigidbody>().centerOfMass - new Vector3(0, _centerOfMassOffset, 0);
-        _milkBox.SetActive(true);
+        //_milkBox.SetActive(true);
         GetComponent<Rigidbody>().centerOfMass = _centerOfMass;
     }
 
