@@ -1,12 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class WheelPhysics2 : MonoBehaviour
 {
     //References
     private Rigidbody _rgbd;
+    private CarController2 _carController;
 	[SerializeField] private Transform _wheelTransform;
+    [SerializeField] private VisualEffect _smokeEffect;
+    [SerializeField] private TrailRenderer _skidMark;
     
     //Wheels
 	[SerializeField] private bool _frontLeftWheel;
@@ -46,11 +50,12 @@ public class WheelPhysics2 : MonoBehaviour
 
     [Header("Acceleration")]
     [SerializeField] private AnimationCurve _accelCurve;
-    [SerializeField] private float _maxSpeed;
+    //[SerializeField] private float _maxSpeed;
     [SerializeField] private float _accelStrength;
     [SerializeField] private float _brakeStrength;
     [SerializeField] private float _rollingBrakeStrength;
-    [SerializeField] private float _currentSpeed;
+    //[SerializeField] private float _currentSpeed;
+    //public float CurrentSpeed { get => _currentSpeed; set => _currentSpeed = value; }
     private float _normalizedSpeed;
     private float _availableTorque;
     private Vector3 _accelForce;
@@ -78,22 +83,19 @@ public class WheelPhysics2 : MonoBehaviour
     private void Start()
     {
         _rgbd = transform.root.GetComponent<Rigidbody>();
+        _carController = transform.root.GetComponent<CarController2>();
     }
 
     private void Update()
     {
         DriftFactor();
+        DriftSmoke();
         RotateWheel();
         SpinWheel();
     }
 
     private void FixedUpdate()
     {
-        if (_rgbd.velocity.magnitude < 0.01f)
-        {
-            _rgbd.velocity = Vector3.zero;
-        }
-        _rgbd.velocity = Vector3.ClampMagnitude(_rgbd.velocity, _maxSpeed);
         Force();
     }
 
@@ -118,14 +120,14 @@ public class WheelPhysics2 : MonoBehaviour
             _rgbd.AddForceAtPosition(_steeringForce, transform.position);
 
             //Acceleration force
-            _currentSpeed = Vector3.Dot(_rgbd.transform.forward, _rgbd.velocity);
-            _normalizedSpeed = Mathf.Clamp01(Mathf.Abs(_currentSpeed) / _maxSpeed);
+            //_currentSpeed = Vector3.Dot(_rgbd.transform.forward, _rgbd.velocity);
+            _normalizedSpeed = Mathf.Clamp01(Mathf.Abs(_carController.CurrentSpeed) / _carController.MaxSpeed);
             _availableTorque = _accelCurve.Evaluate(_normalizedSpeed) * _accelDirection;
             _accelForce = transform.forward * _availableTorque * _accelStrength;
             _rgbd.AddForceAtPosition(_accelForce, transform.position);
 
             //Brake force
-            if (_isBraking && Mathf.Abs(_currentSpeed) > 0)
+            if (_isBraking && Mathf.Abs(_carController.CurrentSpeed) > 0)
             {
                 //_reverseSpeed = Vector3.Dot(-_rgbd.transform.forward, _rgbd.velocity);
                 _brakeForce = -_rgbd.velocity.normalized * _brakeStrength * _accelStrength;
@@ -164,6 +166,31 @@ public class WheelPhysics2 : MonoBehaviour
         else
         {
             _driftMultiplier = Mathf.Lerp(_driftMultiplier, _defaultDriftMultiplier, 0.5f * Time.deltaTime);
+        }
+    }
+
+    private void DriftSmoke()
+    {
+        if (_rearLeftWheel || _rearRightWheel)
+        {
+            if (Mathf.Abs(_carController.CurrentSpeed) < 0.1f)
+            {
+                _smokeEffect.Stop();
+                _skidMark.emitting = false;
+                return;
+            }
+
+            if (_isBraking)
+            {
+                _smokeEffect.SetVector3("StartPos", transform.position);
+                _smokeEffect.Play();
+                _skidMark.emitting = true;
+            }
+            else
+            {
+                _smokeEffect.Stop();
+                _skidMark.emitting = false;
+            }
         }
     }
 }
