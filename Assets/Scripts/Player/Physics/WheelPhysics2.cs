@@ -50,18 +50,22 @@ public class WheelPhysics2 : MonoBehaviour
 
     [Header("Acceleration")]
     [SerializeField] private AnimationCurve _accelCurve;
+    [SerializeField] private AnimationCurve _reverseCurve;
     //[SerializeField] private float _maxSpeed;
     [SerializeField] private float _accelStrength;
     [SerializeField] private float _brakeStrength;
     [SerializeField] private float _rollingBrakeStrength;
+    [SerializeField] private float _reverseStrength;
     //[SerializeField] private float _currentSpeed;
     //public float CurrentSpeed { get => _currentSpeed; set => _currentSpeed = value; }
+    [SerializeField] private float _currentDirection;
     private float _normalizedSpeed;
     private float _availableTorque;
     private Vector3 _accelForce;
-    private float _reverseSpeed;
     private Vector3 _brakeForce;
     private Vector3 _rollingForce;
+    [SerializeField] private float _reverseMultiplier;
+
 
     [Header("Drifting")]
     [SerializeField] private float _defaultDriftMultiplier;
@@ -123,7 +127,19 @@ public class WheelPhysics2 : MonoBehaviour
             //_currentSpeed = Vector3.Dot(_rgbd.transform.forward, _rgbd.velocity);
             _normalizedSpeed = Mathf.Clamp01(Mathf.Abs(_carController.CurrentSpeed) / _carController.MaxSpeed);
             _availableTorque = _accelCurve.Evaluate(_normalizedSpeed) * _accelDirection;
-            _accelForce = transform.forward * _availableTorque * _accelStrength;
+
+            //Reverse
+            _currentDirection = Vector3.Dot(_rgbd.transform.forward, _rgbd.velocity);
+            if (Mathf.Sign(_currentDirection) != Mathf.Sign(_accelDirection) && Mathf.Abs(_carController.CurrentSpeed) > 0f)
+            {
+                _reverseMultiplier = _reverseCurve.Evaluate(_normalizedSpeed) * _reverseStrength;
+            }
+            else
+            {
+                _reverseMultiplier = 1f;
+            }
+
+            _accelForce = transform.forward * _availableTorque * _accelStrength * _reverseMultiplier;
             _rgbd.AddForceAtPosition(_accelForce, transform.position);
 
             //Brake force
