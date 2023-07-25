@@ -26,6 +26,10 @@ public class CarInput : MonoBehaviour
         _carControls.Car.Steer.canceled += Steer;
         _carControls.Car.Brake.performed += Brake;
         _carControls.Car.Brake.canceled += Brake;
+
+        _carControls.Car.OpenQuest.performed += OpenQuest;
+        _carControls.Car.Pause.performed += Pause;
+        _carControls.Car.Map.performed += OpenMap;
     }
 
     public void Accelerate(InputAction.CallbackContext context)
@@ -47,5 +51,20 @@ public class CarInput : MonoBehaviour
         _carController?.HandleBrake(context.performed);
         _carController1?.Brake(context.performed);
         _carController2?.Brake(context.performed);
+    }
+
+    public void OpenQuest(InputAction.CallbackContext context)
+    {
+        GameUIManager.I_GameUIManager.QuestSwitch();
+    }
+
+    public void Pause(InputAction.CallbackContext context)
+    {
+        GameUIManager.I_GameUIManager.PauseSwitch();
+    }
+
+    public void OpenMap(InputAction.CallbackContext context)
+    {
+        GameUIManager.I_GameUIManager.MapSwitch();
     }
 }

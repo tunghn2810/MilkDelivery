@@ -7,26 +7,35 @@ public class CarController2 : MonoBehaviour
     private Rigidbody _rgbd;
 
     [SerializeField] private float _centerOfMassOffset;
+    [SerializeField] private GameObject _massCollider;
+    [SerializeField] private GameObject _carCollider;
     public WheelPhysics2[] _wheels;
 
-    private float _steerAngle;
-    private float _steerInput;
-    private Vector2 _accelDirection;
-    private bool _isBraking;
+    //Input
+    [SerializeField] private float _steerAngle;
+    [SerializeField] private float _steerInput;
+    [SerializeField] private Vector2 _accelDirection;
+    [SerializeField] private bool _isBraking;
+
     [SerializeField] private float _maxSpeed;
     public float MaxSpeed { get => _maxSpeed; }
     [SerializeField, Range(0, 1)] private float _turnCurve;
 
     private Vector3 _centerOfMass;
-    [SerializeField] private GameObject _milkBox;
 
     private float _currentSpeed;
     public float CurrentSpeed { get => _currentSpeed; }
+
+    [SerializeField] private Vector3 _lastPosition;
+    public Vector3 LastPosition { get => _lastPosition; set => _lastPosition = value; }
+
 
     private void Awake()
     {
         _rgbd = GetComponent<Rigidbody>();
         _centerOfMass = _rgbd.centerOfMass - new Vector3(0, _centerOfMassOffset, 0);
+        _massCollider.SetActive(false);
+        _carCollider.SetActive(true);
         //_milkBox.SetActive(true);
         _rgbd.centerOfMass = _centerOfMass;
     }
@@ -82,5 +91,13 @@ public class CarController2 : MonoBehaviour
             _rgbd.velocity = Vector3.zero;
         }
         _rgbd.velocity = Vector3.ClampMagnitude(_rgbd.velocity, _maxSpeed);
+    }
+
+    public void ResetPosition()
+    {
+        transform.position = _lastPosition;
+        transform.rotation = Quaternion.identity;
+        _rgbd.velocity = Vector3.zero;
+        _rgbd.angularVelocity = Vector3.zero;
     }
 }

@@ -5,6 +5,13 @@ TagManager:
   serializedVersion: 2
   tags:
   - QuestCircle
+  - PathNode
+  - Donut
+  - Baguette
+  - Croissant
+  - CrossBun
+  - Obstacle
+  - Terrain
   layers:
   - Default
   - TransparentFX
@@ -12,24 +19,24 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - Player
+  - BreadContainer
   - 
   - 
   - Obstacle
   - 
   - 
   - 
+  - Bread
+  - 
+  - 
+  - QuestCircle
+  - RefillCircle
   - 
   - 
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - PathNode
   - 
   - 
   - 

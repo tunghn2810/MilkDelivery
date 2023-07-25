@@ -1,18 +1,23 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PathNode : MonoBehaviour
 {
     [SerializeField] private PathNode[] _connectedNodes;
-    [SerializeField] private float[] _distanceToOthers;
+    public PathNode[] ConnectedNodes { get { return _connectedNodes; } }
+    [SerializeField] private float[] _distanceToAdjacents;
 
-    private Dictionary<PathNode, float> _distanceDict;
+    private Dictionary<PathNode, float> _distanceDict = new Dictionary<PathNode, float>();
+
+    [SerializeField] private float _distanceToEnd;
 
     private void Awake()
     {
-        _distanceToOthers = new float[_connectedNodes.Length];
+        _distanceToAdjacents = new float[_connectedNodes.Length];
+        CalculateDist();
     }
 
     private void CalculateDist()
@@ -20,30 +25,26 @@ public class PathNode : MonoBehaviour
         for (int i = 0; i < _connectedNodes.Length; i++)
         {
             float distance = Vector3.Distance(transform.position, _connectedNodes[i].transform.position);
-            _distanceToOthers[i] = distance;
+            _distanceToAdjacents[i] = distance;
             _distanceDict.Add(_connectedNodes[i], distance);
         }
-
-        Array.Sort(_distanceToOthers);
+        Array.Sort(_distanceToAdjacents);
     }
 
-    private PathNode GetShortestPath(PathNode exclude)
+    public PathNode GetShortestPath(int index)
     {
-        int index = 0;
         foreach (var pair in _distanceDict)
         {
-            if (pair.Value == _distanceToOthers[index])
+            if (pair.Value == _distanceToAdjacents[index])
             {
-                if (pair.Key == exclude)
-                {
-                    index++;
-                }
-                else
-                {
-                    return pair.Key;
-                }
+                return pair.Key;
             }
         }
         return null;
+    }
+
+    public float GetDistanceToNode(PathNode node)
+    {
+        return Vector3.Distance(transform.position, node.transform.position);
     }
 }

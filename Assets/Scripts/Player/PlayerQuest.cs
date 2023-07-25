@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerQuest : MonoBehaviour
 {
     private Rigidbody _rgbd;
+    private BreadContainer _breadContainer;
 
     private bool _returningQuest;
     private float _currentSpeed;
@@ -12,15 +13,20 @@ public class PlayerQuest : MonoBehaviour
     private void Awake()
     {
         _rgbd = GetComponent<Rigidbody>();
+        _breadContainer = GetComponentInChildren<BreadContainer>();
     }
 
     private void Update()
     {
         _currentSpeed = _rgbd.velocity.magnitude;
 
-        if (_returningQuest && _currentSpeed <= 0.01f)
+        if (_returningQuest && _currentSpeed <= 0.1f)
         {
-            Debug.Log("Finish quest!");
+            _breadContainer.QuestReady = true;
+        }
+        else
+        {
+            _breadContainer.QuestReady = false;
         }
     }
 

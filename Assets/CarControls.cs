@@ -53,6 +53,42 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OpenQuest"",
+                    ""type"": ""Button"",
+                    ""id"": ""78d710bb-9ff3-455d-8db5-844a6b367b2a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Use"",
+                    ""type"": ""Button"",
+                    ""id"": ""b0821196-02f2-423e-82bd-16a1358fb537"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Pause"",
+                    ""type"": ""Button"",
+                    ""id"": ""5c00655e-c779-48bd-80e5-d72b96d8f664"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Map"",
+                    ""type"": ""Button"",
+                    ""id"": ""5db42df4-144f-4b80-9b27-2c102f9c0235"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -132,6 +168,61 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
                     ""action"": ""Brake"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""52ed2839-5e9e-485c-a4f6-96d02e916f19"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenQuest"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""94d85e56-df45-463c-9d2a-0ab945cdd3f5"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Use"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c157bbaf-70c3-446d-8b86-aa92a6f53596"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""40d2f27c-a4aa-4b3e-9f15-5f5524f6b06b"",
+                    ""path"": ""<Keyboard>/p"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e817a8dc-137f-4115-a8a2-52470d2988dd"",
+                    ""path"": ""<Keyboard>/m"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Map"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -143,6 +234,10 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
         m_Car_Accelerate = m_Car.FindAction("Accelerate", throwIfNotFound: true);
         m_Car_Steer = m_Car.FindAction("Steer", throwIfNotFound: true);
         m_Car_Brake = m_Car.FindAction("Brake", throwIfNotFound: true);
+        m_Car_OpenQuest = m_Car.FindAction("OpenQuest", throwIfNotFound: true);
+        m_Car_Use = m_Car.FindAction("Use", throwIfNotFound: true);
+        m_Car_Pause = m_Car.FindAction("Pause", throwIfNotFound: true);
+        m_Car_Map = m_Car.FindAction("Map", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -207,6 +302,10 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Car_Accelerate;
     private readonly InputAction m_Car_Steer;
     private readonly InputAction m_Car_Brake;
+    private readonly InputAction m_Car_OpenQuest;
+    private readonly InputAction m_Car_Use;
+    private readonly InputAction m_Car_Pause;
+    private readonly InputAction m_Car_Map;
     public struct CarActions
     {
         private @CarControls m_Wrapper;
@@ -214,6 +313,10 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
         public InputAction @Accelerate => m_Wrapper.m_Car_Accelerate;
         public InputAction @Steer => m_Wrapper.m_Car_Steer;
         public InputAction @Brake => m_Wrapper.m_Car_Brake;
+        public InputAction @OpenQuest => m_Wrapper.m_Car_OpenQuest;
+        public InputAction @Use => m_Wrapper.m_Car_Use;
+        public InputAction @Pause => m_Wrapper.m_Car_Pause;
+        public InputAction @Map => m_Wrapper.m_Car_Map;
         public InputActionMap Get() { return m_Wrapper.m_Car; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -232,6 +335,18 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
             @Brake.started += instance.OnBrake;
             @Brake.performed += instance.OnBrake;
             @Brake.canceled += instance.OnBrake;
+            @OpenQuest.started += instance.OnOpenQuest;
+            @OpenQuest.performed += instance.OnOpenQuest;
+            @OpenQuest.canceled += instance.OnOpenQuest;
+            @Use.started += instance.OnUse;
+            @Use.performed += instance.OnUse;
+            @Use.canceled += instance.OnUse;
+            @Pause.started += instance.OnPause;
+            @Pause.performed += instance.OnPause;
+            @Pause.canceled += instance.OnPause;
+            @Map.started += instance.OnMap;
+            @Map.performed += instance.OnMap;
+            @Map.canceled += instance.OnMap;
         }
 
         private void UnregisterCallbacks(ICarActions instance)
@@ -245,6 +360,18 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
             @Brake.started -= instance.OnBrake;
             @Brake.performed -= instance.OnBrake;
             @Brake.canceled -= instance.OnBrake;
+            @OpenQuest.started -= instance.OnOpenQuest;
+            @OpenQuest.performed -= instance.OnOpenQuest;
+            @OpenQuest.canceled -= instance.OnOpenQuest;
+            @Use.started -= instance.OnUse;
+            @Use.performed -= instance.OnUse;
+            @Use.canceled -= instance.OnUse;
+            @Pause.started -= instance.OnPause;
+            @Pause.performed -= instance.OnPause;
+            @Pause.canceled -= instance.OnPause;
+            @Map.started -= instance.OnMap;
+            @Map.performed -= instance.OnMap;
+            @Map.canceled -= instance.OnMap;
         }
 
         public void RemoveCallbacks(ICarActions instance)
@@ -267,5 +394,9 @@ public partial class @CarControls: IInputActionCollection2, IDisposable
         void OnAccelerate(InputAction.CallbackContext context);
         void OnSteer(InputAction.CallbackContext context);
         void OnBrake(InputAction.CallbackContext context);
+        void OnOpenQuest(InputAction.CallbackContext context);
+        void OnUse(InputAction.CallbackContext context);
+        void OnPause(InputAction.CallbackContext context);
+        void OnMap(InputAction.CallbackContext context);
     }
 }

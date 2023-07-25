@@ -74,6 +74,12 @@ public class WheelPhysics2 : MonoBehaviour
     //Wheel spin
     private float _spinAngle;
 
+    //Grounded
+    private bool _isGrounded;
+    private float _lastPosTimer = 0;
+    private float _lastPosCD = 3f;
+
+
     //Inputs
 	[SerializeField] private float _steerAngle;
     public float SteerAngle { get => _steerAngle; set => _steerAngle = value; }
@@ -105,8 +111,25 @@ public class WheelPhysics2 : MonoBehaviour
 
 	private void Force()
 	{
-		if (Physics.Raycast(transform.position, -transform.up, out RaycastHit hit, _raycastLength))
+		if (Physics.Raycast(transform.position, -transform.up, out RaycastHit hit, _raycastLength)) //Grounded raycast
 		{
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Water"))
+            {
+                _isGrounded = false;
+                return;
+            }
+            _isGrounded = true;
+
+            if (_lastPosTimer < _lastPosCD)
+            {
+                _lastPosTimer += Time.fixedDeltaTime;
+            }
+            else
+            {
+                _carController.LastPosition = hit.point + new Vector3(0, 3f, 0);
+                _lastPosTimer = 0;
+            }
+
             //World-space velocity of the wheel
             _worldVelocity = _rgbd.GetPointVelocity(transform.position);
 
@@ -157,6 +180,10 @@ public class WheelPhysics2 : MonoBehaviour
                 _rgbd.AddForceAtPosition(_rollingForce, transform.position);
             }
         }
+        else
+        {
+            _isGrounded = false;
+        }
 	}
 
     private void RotateWheel()
@@ -189,6 +216,8 @@ public class WheelPhysics2 : MonoBehaviour
     {
         if (_rearLeftWheel || _rearRightWheel)
         {
+            _smokeEffect.SetVector3("StartPos", transform.position); _smokeEffect.Play();
+
             if (Mathf.Abs(_carController.CurrentSpeed) < 0.1f)
             {
                 _smokeEffect.Stop();
@@ -196,9 +225,8 @@ public class WheelPhysics2 : MonoBehaviour
                 return;
             }
 
-            if (_isBraking)
+            if (_isBraking && _isGrounded)
             {
-                _smokeEffect.SetVector3("StartPos", transform.position);
                 _smokeEffect.Play();
                 _skidMark.emitting = true;
             }
